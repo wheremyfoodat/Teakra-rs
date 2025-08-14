@@ -17,7 +17,10 @@ fn setup_linking() {
     println!("cargo:rustc-link-search={}/build/src", outPath);
 
     // Tell cargo to tell rustc to link teakra and stdc++
-    println!("cargo:rustc-flags=-lteakra_c -lteakra -lstdc++");
+    // Note: On Apple we have to link libc++, otherwise we have to link libstdc++
+    let targetOS = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let cpp = if targetOS == "macos" { "c++" } else { "stdc++" };
+    println!("cargo:rustc-flags=-lteakra_c -lteakra -l{}", cpp);
 }
 
 fn generate_bindings() {
